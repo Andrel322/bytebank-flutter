@@ -2,6 +2,7 @@ import 'package:bytebanksqlite/components/share/progress.dart';
 import 'package:bytebanksqlite/database/dao/contact.dart';
 import 'package:bytebanksqlite/models/contact.dart';
 import 'package:bytebanksqlite/screens/contact_form.dart';
+import 'package:bytebanksqlite/screens/transaction_form.dart';
 import 'package:flutter/material.dart';
 
 class ContactsList extends StatefulWidget {
@@ -39,7 +40,13 @@ class _ContactsListState extends State<ContactsList> {
                 itemBuilder: (context, index) {
                   final contact = contacts[index];
 
-                  return _ContactItem(contact);
+                  return _ContactItem(
+                    contact,
+                    onClick: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => TransactionForm(contact)));
+                    },
+                  );
                 },
                 itemCount: contacts.length,
               );
@@ -63,13 +70,15 @@ class _ContactsListState extends State<ContactsList> {
 
 class _ContactItem extends StatelessWidget {
   final Contact contact;
+  final Function onClick;
 
-  _ContactItem(this.contact);
+  _ContactItem(this.contact, {@required this.onClick});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
+        onTap: this.onClick,
         title: Text(contact.name),
         subtitle: Text(
           contact.accountNumber.toString(),

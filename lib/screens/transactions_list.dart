@@ -1,10 +1,12 @@
 import 'package:bytebanksqlite/components/share/centered_message.dart';
 import 'package:bytebanksqlite/components/share/progress.dart';
-import 'package:bytebanksqlite/http/webclient.dart';
+import 'package:bytebanksqlite/http/webclients/transaction_webclient.dart';
 import 'package:bytebanksqlite/models/transaction.dart';
 import 'package:flutter/material.dart';
 
 class TransactionsList extends StatelessWidget {
+  final TransactionWebclient _transactionWebclient = new TransactionWebclient();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,7 +14,7 @@ class TransactionsList extends StatelessWidget {
         title: Text('Transactions'),
       ),
       body: FutureBuilder<List<Transaction>>(
-        future: findAll(),
+        future: _transactionWebclient.findAll(),
         builder:
             (BuildContext context, AsyncSnapshot<List<Transaction>> snapshot) {
           switch (snapshot.connectionState) {
@@ -24,7 +26,7 @@ class TransactionsList extends StatelessWidget {
             case ConnectionState.active:
               break;
             case ConnectionState.done:
-              if(snapshot.hasData && snapshot.data.isNotEmpty){
+              if (snapshot.hasData && snapshot.data.isNotEmpty) {
                 final List<Transaction> transactions = snapshot.data;
 
                 return ListView.builder(
@@ -53,7 +55,8 @@ class TransactionsList extends StatelessWidget {
                 );
               }
 
-              return CenteredMessage('No Transactions Found', icon: Icons.warning);
+              return CenteredMessage('No Transactions Found',
+                  icon: Icons.warning);
               break;
           }
 
