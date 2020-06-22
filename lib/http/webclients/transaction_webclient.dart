@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:bytebanksqlite/http/webclient.dart';
-import 'package:bytebanksqlite/models/contact.dart';
 import 'package:bytebanksqlite/models/transaction.dart';
 import 'package:http/http.dart';
 
@@ -15,26 +14,22 @@ class TransactionWebclient {
   }
 
   Future<Transaction> save(Transaction transaction) async {
-    Map<String, dynamic> transactionMap = _toMap(transaction);
-
     final Response response = await client.post(
       baseUrl,
       headers: {
         'Content-type': 'application/json',
         'password': '1000',
       },
-      body: jsonEncode(transactionMap),
+      body: jsonEncode(transaction.toJson()),
     );
 
     return _toTransaction(response);
   }
 
   Transaction _toTransaction(Response response) {
-    final Map<String, dynamic> decodeTransaction = jsonDecode(response.body);
-    final Contact contact = Contact(0, decodeTransaction['contact']['name'],
-        decodeTransaction['contact']['accountNumber']);
+    final Map<String, dynamic> json = jsonDecode(response.body);
 
-    return Transaction(decodeTransaction['value'], contact);
+    return Transaction.fromJson(json);
   }
 
   List<Transaction> _toTransactions(Response response) {
@@ -42,21 +37,9 @@ class TransactionWebclient {
     final List<Transaction> transactions = List();
 
     for (Map<String, dynamic> decodeTransaction in decodeTransactions) {
-      final Contact contact = Contact(0, decodeTransaction['contact']['name'],
-          decodeTransaction['contact']['accountNumber']);
-      transactions.add(Transaction(decodeTransaction['value'], contact));
+      transactions.add(Transaction.fromJson(decodeTransaction));
     }
-    return transactions;
-  }
 
-  Map<String, dynamic> _toMap(Transaction transaction) {
-    final Map<String, dynamic> transactionMap = {
-      'value': transaction.value,
-      'contact': {
-        'name': transaction.contact.name,
-        'accountNumber': transaction.contact.accountNumber
-      }
-    };
-    return transactionMap;
+    return transactions;
   }
 }

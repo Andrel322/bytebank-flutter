@@ -15,14 +15,6 @@ class TransactionDAO {
       "$_datetime DATETIME"
       "FOREIGN KEY($_contact) REFERENCES contacts(id))";
 
-  Map<String, dynamic> _toMap(Transaction transaction) {
-    final Map<String, dynamic> transactionMap = Map();
-
-    transactionMap[_value] = transaction.value;
-    transactionMap[_contact] = transaction.contact;
-    return transactionMap;
-  }
-
   Future<List<Transaction>> findAll() async {
     final Database db = await getDatabase();
     final List<Map<String, dynamic>> result = await db.query(_tableName);
